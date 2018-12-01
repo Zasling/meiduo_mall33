@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'meiduo_mall33',
-        'USER': 'meiduo33',
-        'PASSWORD': 'meiduo33',
+        'NAME': 'meiduo_mall',
+        'USER': 'meiduo',
+        'PASSWORD': 'meiduo',
         'HOST':'127.0.0.1',
         'PORT':'3306'
     }
@@ -331,7 +331,7 @@ HAYSTACK_CONNECTIONS = {
     # ENGINE为选用搜索引擎,可以更换
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.220.128:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.117.144:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo',  # 指定elasticsearch建立的索引库的名称
     },
 }
@@ -340,7 +340,7 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # 支付宝
-ALIPAY_APPID = "2016091300505120"
+ALIPAY_APPID = "2016092400584123"
 ALIPAY_URL = "https://openapi.alipaydev.com/gateway.do?"
 ALIPAY_DEBUG = True
 
