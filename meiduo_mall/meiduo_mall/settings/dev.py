@@ -100,8 +100,8 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'meiduo_mall33',
-        'USER': 'meiduo33',
+        'NAME': 'meiduo_mall',
+        'USER': 'meiduo',
         'PASSWORD': 'meiduo33',
         'HOST':'127.0.0.1',
         'PORT':'3306'
@@ -340,7 +340,8 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # 支付宝
-ALIPAY_APPID = "2016091300505120"
+# ALIPAY_APPID = "2016092300580479"
+ALIPAY_APPID = "2016092300576919"
 ALIPAY_URL = "https://openapi.alipaydev.com/gateway.do?"
 ALIPAY_DEBUG = True
 

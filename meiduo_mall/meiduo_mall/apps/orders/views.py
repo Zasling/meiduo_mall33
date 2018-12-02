@@ -3,12 +3,15 @@ from rest_framework.views import APIView
 from django_redis import get_redis_connection
 from goods.models import SKU
 from decimal import Decimal
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView,ListAPIView
+from rest_framework.mixins import ListModelMixin
+from orders.serializers import OrderShowSerializer, OrderSaveSerializer, OrderListSerializer
+
+from orders.models import OrderInfo,OrderGoods
+from orders.utils import PageNum
+from rest_framework.filters import OrderingFilter
 
 # 展示订单信息
-from orders.serializers import OrderShowSerializer, OrderSaveSerializer
-
-
 class OrdersShowView(APIView):
 
     def get(self, request):
@@ -38,8 +41,21 @@ class OrdersShowView(APIView):
 
 
 # 保存订单信息
-class OrderSaveView(CreateAPIView):
+class OrderSaveView(ListModelMixin, CreateAPIView):
     serializer_class = OrderSaveSerializer
+
+# 订单列表数据获取
+class OrderListView(ListAPIView):
+    pagination_class = PageNum
+    serializer_class = OrderListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        order = OrderInfo.objects.filter(user = user)
+        return order
+
+
+
 
 
 

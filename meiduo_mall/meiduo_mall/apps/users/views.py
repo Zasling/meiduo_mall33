@@ -95,7 +95,7 @@ class EmailView(UpdateAPIView):
         return self.request.user
 
 
-# 验证有效有效性
+# 验证邮箱有效性
 class VerifyEmailView(APIView):
     def get(self, request):
         # 获取前端传入的token

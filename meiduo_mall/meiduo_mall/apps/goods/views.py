@@ -1,3 +1,4 @@
+from django_redis import get_redis_connection
 from drf_haystack.viewsets import HaystackViewSet
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -50,6 +51,4 @@ class SKUSearchViewSet(HaystackViewSet):
     # 指定序列化器,将检索出来的数据进行序列化返回
     serializer_class = SKUSearchSerializers
     pagination_class = PageNum
-
-
 

@@ -5,6 +5,7 @@ from django_redis import get_redis_connection
 from django.db import transaction
 from datetime import datetime
 from decimal import Decimal
+from goods.serializers import SKUListSerializers
 class SKUSerializer(serializers.ModelSerializer):
     # 虽然sku中有count属性,但是序列化器不定义无法提取到
     count = serializers.IntegerField(read_only=True)
@@ -131,5 +132,17 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 conn.srem('cart_selected_%s' % user.id, *cart_selected)
                 return order
 
+class OrderGoodsSerializer(serializers.ModelSerializer):
+    sku = SKUListSerializers(read_only=True)
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+class OrderListSerializer(serializers.ModelSerializer):
+    skus = OrderGoodsSerializer(read_only=True,many=True)
+
+    class Meta:
+        model = OrderInfo
+        fields = '__all__'
 
 

@@ -7,6 +7,7 @@ from goods.search_indexes import SKUIndex
 
 # 显示所有当前商品的所有数据
 class SKUListSerializers(serializers.ModelSerializer):
+    count = serializers.IntegerField(read_only=True)
     class Meta:
         model = SKU
         fields = '__all__'
@@ -20,4 +21,6 @@ class SKUSearchSerializers(HaystackSerializer):
         # 指定索引类,进行序列化返回时,可以将里面的索引字段返回
         index_classes = [SKUIndex]
         fields = ('text', 'object')
+
+
 
