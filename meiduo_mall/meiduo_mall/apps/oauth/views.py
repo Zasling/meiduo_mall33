@@ -99,7 +99,7 @@ class WauthView(APIView):
         # 3.初始化OAuthQQ对象
         wb = OAuthWB(client_id=settings.WEIBO_APP_ID, client_secret=settings.WEIBO_APP_KEY, redirect_uri=settings.WEIBO_REDIRECT_URI, state=state)
         # 4.构造qq跳转链接
-        login_url = wb.get_qq_url()
+        login_url = wb.get_wb_url()
         # 5.返回结果
         return Response({'login_url': login_url})
 
@@ -120,31 +120,31 @@ class ImageCodeView(APIView):
 
 class WbOauthView(CreateAPIView):
     # 只继承CreateAPIView的话只需要serializer_class即可
-    # 当执行绑定openid时(post请求),执行序列化器里的方法
+    # 当执行绑定access_token时(post请求),执行序列化器里的方法
     serializer_class = WbOauthSerializer
 
-    # 获取openid
+    # 获取access_token
     def get(self, request):
         # 1.获取code值
         # 2.判断前端是否传递code值
-        # 3.通过code值获取access_token值,需先建立qq对象
-        # 4.通过access_token获取openid值
+        # 3.通过code值获取access_token值,需先建立sina对象
+
         code = request.GET.get('code', None)
         if not code:
             return Response({'error': '　缺少code值'})
         state = '/'
-        qq = OAuthWB(client_id=settings.WEIBO_APP_ID, client_secret=settings.WEIBO_APP_KEY, redirect_uri=settings.WEIBO_REDIRECT_URI, state=state)
+        sina = OAuthWB(client_id=settings.WEIBO_APP_ID, client_secret=settings.WEIBO_APP_KEY, redirect_uri=settings.WEIBO_REDIRECT_URI, state=state)
 
         try:
-            access_token = qq.get_access_token(code)
+            access_token = sina.get_access_token(code)
         except Exception:
             return Response({'message': 'QQ服务异常'}, status=503)
 
-        # 判断openid是否绑定
+        # 判断access_token是否绑定
         try:
             oauth_user = OAuthSinaUser.objects.get(access_token=access_token)
         except Exception:
-            # 捕获到异常说明openid不存在,用户没有绑定过,将openid返回,用于绑定用户身份并进入绑定界面
+            # 捕获到异常说明access_token不存在,用户没有绑定过,将access_token返回,用于绑定用户身份并进入绑定界面
             tjs = TJS(settings.SECRET_KEY, 300)
             # 加密之后为byte类型,要先解码
             access_token = tjs.dumps({'access_token': access_token}).decode()

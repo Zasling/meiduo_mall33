@@ -62,7 +62,7 @@ var vm = new Vue({
             if (r != null) {
                 return decodeURI(r[2]);
             }
-            return null;
+            return '/';
         },
         // 生成uuid
         generate_uuid: function(){

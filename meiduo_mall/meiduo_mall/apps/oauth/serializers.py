@@ -11,7 +11,7 @@ import re
 from itsdangerous import TimedJSONWebSignatureSerializer as TJS
 from django.conf import settings
 from django_redis import get_redis_connection
-from oauth.models import OAuthQQUser
+from oauth.models import OAuthQQUser, OAuthSinaUser
 
 
 class OauthSerializer(serializers.ModelSerializer):
@@ -144,7 +144,7 @@ class WbOauthSerializer(serializers.ModelSerializer):
 
 
         # 将取出的openid添加到attrs
-        attrs['openid'] = data
+        attrs['access_token'] = data['access_token']
         # 验证短信验证码
         conn = get_redis_connection('sms_code')
         real_sms_code = conn.get('sms_code_%s' %attrs['mobile'])
@@ -176,7 +176,7 @@ class WbOauthSerializer(serializers.ModelSerializer):
             user = User.objects.create_user(username=validated_data['mobile'], password=validated_data['password'], mobile=validated_data['mobile'])
 
         # 绑定openid
-        OAuthQQUser.objects.create(user=user, openid=validated_data['openid'])
+        OAuthSinaUser.objects.create(user=user, access_token=validated_data['access_token'])
 
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
