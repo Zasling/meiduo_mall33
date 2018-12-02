@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from meiduo_mall.utils.models import BaseModel
 
 
+
 # 模型类继承需要继承AbstractUser,继承之后则可以使用我们自定义的字段又可以使用django模型类里自带的方法
 class User(AbstractUser):
     mobile = models.CharField(max_length=11, unique=True, verbose_name='手机号')
@@ -34,3 +35,7 @@ class Address(BaseModel):
         verbose_name = '用户地址'
         verbose_name_plural = verbose_name
         ordering = ['-update_time']
+
+
+
+

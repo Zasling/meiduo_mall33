@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django_crontab',
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传图片模块
+    'captcha',   # 配置自动生成图片验证码模块
 
 ]
 
@@ -100,9 +101,9 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'meiduo_mall33',
-        'USER': 'meiduo33',
-        'PASSWORD': 'meiduo33',
+        'NAME': 'meiduo_mall',
+        'USER': 'meiduo',
+        'PASSWORD': 'meiduo',
         'HOST':'127.0.0.1',
         'PORT':'3306'
     }
@@ -180,6 +181,15 @@ CACHES = {
     "cart": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/4",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+
+    # 存放图片验证码信息的5号库
+    "verify_codes": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/5",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -322,7 +332,7 @@ CKEDITOR_UPLOAD_PATH = ''  # 上传图片保存路径，使用了FastDFS，所�
 #
 CRONJOBS = [
     # 每5分钟执行一次生成主页静态文件
-    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> /home/python/Desktop/kuaima_mall/meiduo_mall/logs/crontab.log')
+    ('*/5 * * * *', 'contents.crons.generate_static_index_html', '>> /home/python/Desktop/meiduo_2/meiduo_mall33/meiduo_mall/logs/meiduo.log')
 ]
 
 
@@ -331,7 +341,7 @@ HAYSTACK_CONNECTIONS = {
     # ENGINE为选用搜索引擎,可以更换
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.220.128:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.57.128:9200/',  # 此处为elasticsearch运行的服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo',  # 指定elasticsearch建立的索引库的名称
     },
 }
@@ -343,4 +353,5 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 ALIPAY_APPID = "2016091300505120"
 ALIPAY_URL = "https://openapi.alipaydev.com/gateway.do?"
 ALIPAY_DEBUG = True
+
 

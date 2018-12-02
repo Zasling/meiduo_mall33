@@ -16,6 +16,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 
+
 class UsernameMobileAuthBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:

@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
 from rest_framework import serializers
+from rest_framework.response import Response
 
 from goods.models import SKU
 from users.models import User
@@ -120,6 +121,7 @@ class EmailSerializer(serializers.ModelSerializer):
         return instance
 
 
+# 添加用户浏览历史序列化器
 class AddUserBrowsingHistorySerializer(serializers.Serializer):
     """
     添加用户浏览历史序列化器
@@ -160,6 +162,33 @@ class AddUserBrowsingHistorySerializer(serializers.Serializer):
         pl.execute()
 
         return validated_data
+
+
+# 验证用户是否存在
+class CheckUserSerializer(serializers.ModelSerializer):
+
+    image_code_id = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = ('username', 'mobile', 'image_code_id')
+
+    def validate(self, attrs):
+        conn = get_redis_connection('cont')
+        if attrs['image_code'] is None:
+            raise Response(status=400)
+        # 获取redis中的图片信息
+        text = conn.hgetall('imageCode_'+attrs['image_code_id'])
+        if str(attrs['image_code']) != text:
+            raise Response({'erron':'验证码不一致'}, status=400)
+
+        return attrs
+
+
+
+
+
+
+
 
 
 
