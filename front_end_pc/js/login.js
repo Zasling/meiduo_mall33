@@ -94,6 +94,20 @@ var vm = new Vue({
                 .catch(error => {
                     console.log(error.response.data);
                 })
+        },
+        // qq登录
+        weixin_login: function(){
+            var next = this.get_query_string('next') || '/';
+            axios.get(this.host + '/oauth/weixin/authorization/?next=' + next, {
+                    responseType: 'json',
+                    withCredentials: true
+                })
+                .then(response => {
+                    location.href = response.data.login_url;
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
         }
     }
 });
