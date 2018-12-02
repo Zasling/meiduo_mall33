@@ -1,13 +1,18 @@
+from django.http import HttpResponse
 from django.shortcuts import render
+from django_redis import get_redis_connection
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
 from QQLoginTool.QQtool import OAuthQQ
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
+
+from meiduo_mall.libs.captcha.captcha import captcha
+from oauth import constants
 from oauth.models import OAuthQQUser, OAuthSinaUser
 from itsdangerous import TimedJSONWebSignatureSerializer as TJS
-from oauth.serializers import OauthSerializer
+from oauth.serializers import OauthSerializer, WbOauthSerializer
 from oauth.wbtool import OAuthWB
 from users.models import User
 # 第三方登陆管理视图
@@ -98,10 +103,25 @@ class WauthView(APIView):
         # 5.返回结果
         return Response({'login_url': login_url})
 
+class ImageCodeView(APIView):
+    """
+    图片验证码
+    """
+    def get(self, request, image_code_id):
+        # 生成验证码图片
+        name, text, image = captcha.generate_captcha()
+
+        redis_conn = get_redis_connection("verify_codes")
+        redis_conn.setex("img_%s" % image_code_id, constants.IMAGE_CODE_REDIS_EXPIRES, text)
+
+        # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
+        # 所以此处直接使用Django原生的HttpResponse即可
+        return HttpResponse(image)
+
 class WbOauthView(CreateAPIView):
     # 只继承CreateAPIView的话只需要serializer_class即可
     # 当执行绑定openid时(post请求),执行序列化器里的方法
-    # serializer_class = OauthSerializer
+    serializer_class = WbOauthSerializer
 
     # 获取openid
     def get(self, request):
@@ -127,7 +147,8 @@ class WbOauthView(CreateAPIView):
             # 捕获到异常说明openid不存在,用户没有绑定过,将openid返回,用于绑定用户身份并进入绑定界面
             tjs = TJS(settings.SECRET_KEY, 300)
             # 加密之后为byte类型,要先解码
-            open_id = tjs.dumps({'access_token': access_token}).decode()
+            access_token = tjs.dumps({'access_token': access_token}).decode()
+
             return Response({'access_token': access_token})
         else:
             user = oauth_user.user

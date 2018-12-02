@@ -56,12 +56,12 @@ class OAuthWB(object):
             # 提取数据
             # access_token=FE04************************CCE2&expires_in=7776000&refresh_token=88E4************************BE14
             data = response.text
-            print(type(data))
+            # print(type(data))
             # date = re.sub("\"",'',data)
 
             # 转化为字典
             data = json.loads(data)
-            print(data)
+            # print(data)
         except:
             raise Exception('qq请求失败')
 
@@ -76,28 +76,28 @@ class OAuthWB(object):
 
         # 获取open_id值
 
-    def get_open_id(self, access_token):
-
-        # 构建请求url
-        url = 'https://graph.qq.com/oauth2.0/me?access_token=' + access_token
-
-        # 发送请求
-        try:
-            response = requests.get(url)
-
-            # 提取数据
-            # callback( {"client_id":"YOUR_APPID","openid":"YOUR_OPENID"} );
-            # code=asdasd&msg=asjdhui  错误的时候返回的结果
-            data = response.text
-            data = data[10:-3]
-        except:
-            raise Exception('qq请求失败')
-        # 转化为字典
-        try:
-            data_dict = json.loads(data)
-            # 获取openid
-            openid = data_dict.get('openid')
-        except:
-            raise Exception('openid获取失败')
-
-        return openid
+    # def get_open_id(self, access_token):
+    #
+    #     # 构建请求url
+    #     url = 'https://graph.qq.com/oauth2.0/me?access_token=' + access_token
+    #
+    #     # 发送请求
+    #     try:
+    #         response = requests.get(url)
+    #
+    #         # 提取数据
+    #         # callback( {"client_id":"YOUR_APPID","openid":"YOUR_OPENID"} );
+    #         # code=asdasd&msg=asjdhui  错误的时候返回的结果
+    #         data = response.text
+    #         data = data[10:-3]
+    #     except:
+    #         raise Exception('qq请求失败')
+    #     # 转化为字典
+    #     try:
+    #         data_dict = json.loads(data)
+    #         # 获取openid
+    #         openid = data_dict.get('openid')
+    #     except:
+    #         raise Exception('openid获取失败')
+    #
+    #     return openid
