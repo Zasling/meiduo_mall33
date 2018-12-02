@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'meiduo_mall33',
-        'USER': 'meiduo33',
-        'PASSWORD': 'meiduo33',
+        'NAME': 'meiduo_mall',
+        'USER': 'meiduo',
+        'PASSWORD': 'meiduo',
         'HOST':'127.0.0.1',
         'PORT':'3306'
     }
@@ -280,6 +280,10 @@ QQ_CLIENT_ID = '101474184'
 QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'
 QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'
 
+
+WEIBO_APP_ID = '3305669385'  # Appkey
+WEIBO_APP_KEY = '74c7bea69d5fc64f5c3b80c802325276'   # AppSecret
+WEIBO_REDIRECT_URI = 'http://www.meiduo.site:8080/sina_callback.html'  # 回调函数
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
