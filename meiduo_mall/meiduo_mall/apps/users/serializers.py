@@ -161,7 +161,3 @@ class AddUserBrowsingHistorySerializer(serializers.Serializer):
 
         return validated_data
 
-
-
-
-

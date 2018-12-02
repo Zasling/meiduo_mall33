@@ -15,6 +15,34 @@ from itsdangerous import TimedJSONWebSignatureSerializer as TJS
 from users.utils import merge_cart_cookie_to_redis
 
 
+# 重置密码
+class Reset_Password(APIView):
+    def put(self, request, user_id):
+        user = request.user
+        # password = user.password
+        # user_id = user.id
+
+        data = request.data
+        vaild = user.check_password(data['old_password'])
+        if not vaild:
+            raise ValueError('密码错误')
+
+        new_pwd = data['password']
+        new_cpwd = data['password2']
+
+        if new_pwd == new_cpwd:
+            # # user.save()
+            # user.password = new_pwd
+            # user.save()
+            user.set_password(data['password'])
+            user.save()
+
+        else:
+            raise ValueError('两次密码不一致')
+
+        return Response({'message': 'ok'})
+
+
 # 发送短信
 class SmsCodeView(APIView):
     def get(self, request, mobile):
@@ -30,11 +58,11 @@ class SmsCodeView(APIView):
         # 3. 保存验证码到redis
         pl = conn.pipeline()
         # 通过管道将2个相同操作进行整合，只需要连接一次redis
-        pl.setex('sms_code_%s'%mobile, 300, sms_code)
+        pl.setex('sms_code_%s' % mobile, 300, sms_code)
         # 设置一个条件判断是否为1分钟后再次发送
-        pl.setex('sms_code_flag_%s' %mobile, 60, 'a')
+        pl.setex('sms_code_flag_%s' % mobile, 60, 'a')
         pl.execute()
-        # 4.发送验证码
+        # 4.发送验证码zzzzzz
 
         # 1.ccp = CCP()
         # 手机号， 短信验证码+过期时间，1号模板
@@ -122,6 +150,7 @@ class VerifyEmailView(APIView):
 # 保存用户浏览记录
 class UserBrowsingHistoryView(CreateAPIView):
     serializer_class = AddUserBrowsingHistorySerializer
+
     # permission_classes = [IsAuthenticated]
 
     # 获取用户浏览记录
@@ -129,7 +158,7 @@ class UserBrowsingHistoryView(CreateAPIView):
         user = request.user
         conn = get_redis_connection('history')
         # 取出5条浏览记录
-        sku_ids = conn.lrange('history_%s'% user.id, 0, 6)
+        sku_ids = conn.lrange('history_%s' % user.id, 0, 6)
         # 通过sku——id在SKU表里过滤出对应的数据对象
         skus = SKU.objects.filter(id__in=sku_ids)
         # 序列化返回
@@ -148,6 +177,6 @@ class UserAuthorizeView(ObtainJSONWebToken):
         if serializer.is_valid():
             user = serializer.object.get('user') or request.user
             # 普通传参.传参顺序必须一致
-            response = merge_cart_cookie_to_redis(request, user,response)
+            response = merge_cart_cookie_to_redis(request, user, response)
         # 结果返回
         return response

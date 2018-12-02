@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'meiduo_mall33',
-        'USER': 'meiduo33',
-        'PASSWORD': 'meiduo33',
+        'NAME': 'meiduo_mall',
+        'USER': 'meiduo',
+        'PASSWORD': 'meiduo',
         'HOST':'127.0.0.1',
         'PORT':'3306'
     }
