@@ -151,3 +151,8 @@ class UserAuthorizeView(ObtainJSONWebToken):
             response = merge_cart_cookie_to_redis(request, user,response)
         # 结果返回
         return response
+
+
+class PasswordReset(UpdateAPIView):
+    def put(self, request):
+        pass
