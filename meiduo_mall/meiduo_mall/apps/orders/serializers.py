@@ -5,6 +5,8 @@ from django_redis import get_redis_connection
 from django.db import transaction
 from datetime import datetime
 from decimal import Decimal
+
+
 class SKUSerializer(serializers.ModelSerializer):
     # 虽然sku中有count属性,但是序列化器不定义无法提取到
     count = serializers.IntegerField(read_only=True)
@@ -132,4 +134,8 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 return order
 
 
-
+# class CriticismSerializers(serializers.ModelSerializer):
+#     order_id = serializers.IntegerField(min_value=1,read_only=True)
+#     class Meta:
+#         model = OrderGoods
+#         fields =

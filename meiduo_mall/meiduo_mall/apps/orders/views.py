@@ -1,14 +1,16 @@
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
 from goods.models import SKU
+from rest_framework.generics import GenericAPIView
 from decimal import Decimal
 from rest_framework.generics import CreateAPIView
 
 # 展示订单信息
+from orders.models import OrderGoods, OrderInfo
 from orders.serializers import OrderShowSerializer, OrderSaveSerializer
-
-
+# from django.forms.models import model_to_dict
 class OrdersShowView(APIView):
 
     def get(self, request):
@@ -40,6 +42,42 @@ class OrdersShowView(APIView):
 # 保存订单信息
 class OrderSaveView(CreateAPIView):
     serializer_class = OrderSaveSerializer
+
+
+class CriticismView(APIView):
+    #　实现订单商品评论展示
+
+    def get(self,request,order_id):
+        # 获取前端传入的token从from表单
+        # token = request.query_params.get('token')
+        # if not token:
+        #     return Response({'error': '缺少token'}, status=400)
+        try:
+            order_id = OrderInfo.objects.filter(order_id=order_id)
+        except:
+            return Response('订单不存在')
+
+        try:
+            skus = OrderGoods.objects.filter(order_id=order_id)
+
+        except:
+            return Response('获取数据错误',status=400)
+        # skus = model_to_dict(skus)
+        sku_list=[]
+        for sku in skus:
+            data={
+                'sku':sku.sku_id,
+                'price':sku.price,
+                'score':sku.score,
+                'is_anonymous':sku.is_anonymous,
+                'comment':sku.comment,
+            }
+            sku_list.append(data)
+        return JsonResponse(data=sku_list,safe=False)
+
+
+
+
 
 
 

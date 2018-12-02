@@ -98,7 +98,7 @@ class EmailView(UpdateAPIView):
 # 验证有效有效性
 class VerifyEmailView(APIView):
     def get(self, request):
-        # 获取前端传入的token
+        # 获取前端传入的token从from表单
         token = request.query_params.get('token')
         if not token:
             return Response({'error': '缺少token'}, status=400)
