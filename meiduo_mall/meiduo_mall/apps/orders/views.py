@@ -5,11 +5,14 @@ from django_redis import get_redis_connection
 from goods.models import SKU
 from rest_framework.generics import GenericAPIView
 from decimal import Decimal
-from rest_framework.generics import CreateAPIView
-
+from rest_framework.generics import CreateAPIView,ListAPIView
+from goods.utils import PageNum
+from orders.serializers import orderInfoSerializer, CriticismSerializers
 # 展示订单信息
 from orders.models import OrderGoods, OrderInfo
-from orders.serializers import OrderShowSerializer, OrderSaveSerializer
+from orders.serializers import OrderShowSerializer, OrderSaveSerializer, orderInfoSerializer
+
+
 # from django.forms.models import model_to_dict
 class OrdersShowView(APIView):
 
@@ -44,40 +47,87 @@ class OrderSaveView(CreateAPIView):
     serializer_class = OrderSaveSerializer
 
 
-class CriticismView(APIView):
+class CriticismView(ListAPIView):
+
     #　实现订单商品评论展示
 
-    def get(self,request,order_id):
-        # 获取前端传入的token从from表单
-        # token = request.query_params.get('token')
-        # if not token:
-        #     return Response({'error': '缺少token'}, status=400)
+
+    # def get(self,request,order_id):
+    #
+    #     try:
+    #         order_id = OrderInfo.objects.filter(order_id=order_id)
+    #     except:
+    #         return Response('订单不存在')
+    #
+    #     try:
+    #         skus = OrderGoods.objects.filter(order_id=order_id)
+    #
+    #     except:
+    #         return Response('获取数据错误',status=400)
+    #     # skus = model_to_dict(skus)
+    #     sku_list=[]
+    #     for sku in skus:
+    #         data={
+    #             'sku':sku.order_id,
+    #             'price':sku.price,
+    #             'default_image_url':sku.sku.default_image_url,
+    #             'score':sku.score,
+    #             'is_anonymous':sku.is_anonymous,
+    #             # 'comment':sku.comment,
+    #             'name':sku.sku.name,
+    #             'id':sku.sku_id,
+    #         }
+    #         sku_list.append(data)
+    #     return JsonResponse(data=sku_list,safe=False)
+    serializer_class = CriticismSerializers
+    def get_queryset(self):
+        order_id = self.kwargs['order_id']
+        skus = OrderGoods.objects.filter(order_id=order_id)
+
+        return skus
+
+
+
+class SaveCriticismView(APIView):
+
+    def post(self, request,order_id):
+        # 获取前端数据
+        data =request.data
+        order = data['order']
+        sku = data['sku.id']
+        comment = data['comment']
+        score = data['score']
+        is_anonymous = data['is_anonymous']
+        # 查询数据库
         try:
-            order_id = OrderInfo.objects.filter(order_id=order_id)
+            order_id = OrderGoods.objects.filter(order_id=order_id)
         except:
-            return Response('订单不存在')
-
-        try:
-            skus = OrderGoods.objects.filter(order_id=order_id)
-
-        except:
-            return Response('获取数据错误',status=400)
-        # skus = model_to_dict(skus)
-        sku_list=[]
-        for sku in skus:
-            data={
-                'sku':sku.sku_id,
-                'price':sku.price,
-                'score':sku.score,
-                'is_anonymous':sku.is_anonymous,
-                'comment':sku.comment,
-            }
-            sku_list.append(data)
-        return JsonResponse(data=sku_list,safe=False)
+            return Response({'获取数据错误'},status=400)
+        # 将其覆盖
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+# 订单列表展示
+class OrderListView(ListAPIView):
+    pagination_class = PageNum
+    serializer_class = orderInfoSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        orders = OrderInfo.objects.filter(user_id = user.id)
+
+        return orders
 
 
 

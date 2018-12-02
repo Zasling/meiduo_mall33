@@ -25,6 +25,7 @@ var vm = new Vue({
                     this.skus[i].final_score = 0; // 记录用户确定的星星数
                     Vue.set(this.skus[i], 'comment', '');
                     Vue.set(this.skus[i], 'is_anonymous', false);
+                    Vue.set(this.skus[i], 'default_image_url', '');
                 }
             })
             .catch(error => {
