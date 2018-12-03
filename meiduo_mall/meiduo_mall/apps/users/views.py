@@ -206,7 +206,7 @@ from meiduo_mall.libs.captcha.captcha import captcha  # 导入第三方工具生
 from django.http import HttpResponse  # 导入响应
 from . import constants  # 导入常量文件
 
-from django.contrib import auth
+# from django.contrib import auth
 
 
 # 创建获取图片验证码视图,在redis中存放图片验证码信息
@@ -257,12 +257,14 @@ class CheckUserNameView(APIView):
 # 发送短信验证码
 class SendSmsCodeView(APIView):
     def get(self, request):
-
+        # 获取前端数据
         user_id = request.GET.get('access_token')
+        # 实例化user对象
         user = User.objects.get(id=user_id)
+        # 获取mobile
         mobile = user.mobile
 
-        # 1.获取手机号，进行正则匹配
+        # 1.连接redis数据库存储短信验证码
         conn = get_redis_connection('sms_code')
         # 先判断是否间隔了1分钟
         flag = conn.get('sms_code_flag_%s' % mobile)
@@ -285,12 +287,14 @@ class SendSmsCodeView(APIView):
         return Response({'message': 'ok'})
 
 
-# 表单提交
+# 表单提交与数据库数据进行匹配
 class FormSubmitView(APIView):
     def get(self, request, username):
+        # 获取前端数据
         data = request.query_params
+        # 获取用户输入的短信验证码
         sms_code = data['sms_code']
-        # 获取用户
+        # 获取用户名
         try:
             user = User.objects.get(username=username)
         except:
@@ -312,13 +316,13 @@ class FormSubmitView(APIView):
 # 重置密码
 class CheckPasswordView(APIView):
     def post(self, request, username):
-        # 1.获取原密码
+        # 1.获取
         user = User.objects.get(mobile=username)
         data = request.data
         # 2.获取前端密码
         password = data['password']
         password2 = data['password2']
-        # access_token = data['user_id']
+
         # 3.判断前端两次密码是否一致
         if password == password2:
             # 4.密码一致用新密码替换旧密码
