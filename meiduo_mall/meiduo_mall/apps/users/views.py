@@ -13,6 +13,9 @@ from users.serializers import UserSerializers, UserDetailSerializer, EmailSerial
 from rest_framework.permissions import IsAuthenticated
 from itsdangerous import TimedJSONWebSignatureSerializer as TJS
 from users.utils import merge_cart_cookie_to_redis
+from django.http import HttpResponse
+from meiduo_mall.libs.captcha.captcha import captcha
+from oauth import constants
 
 
 # 发送短信
@@ -152,7 +155,7 @@ class UserAuthorizeView(ObtainJSONWebToken):
         # 结果返回
         return response
 
-
+# 重置密码
 class PasswordReset(UpdateAPIView):
 
     def put(self, request,user_id):
@@ -177,5 +180,18 @@ class PasswordReset(UpdateAPIView):
             user.save()
             return Response({'message': 'ok'})
 
-def post(self,request):
-        pass
+# 图片验证码
+class ImageCodeView(APIView):
+    """
+    图片验证码
+    """
+    def get(self, request, image_code_id):
+        # 生成验证码图片
+        name, text, image = captcha.generate_captcha()
+
+        redis_conn = get_redis_connection("verify_codes")
+        redis_conn.setex("img_%s" % image_code_id, constants.IMAGE_CODE_REDIS_EXPIRES, text)
+
+        # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
+        # 所以此处直接使用Django原生的HttpResponse即可
+        return HttpResponse(image)

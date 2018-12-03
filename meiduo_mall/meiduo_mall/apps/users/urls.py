@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^browse_histories/$', views.UserBrowsingHistoryView.as_view()),
     url(r'^authorizations/$', views.UserAuthorizeView.as_view()),
     url(r'^users/(?P<user_id>\d+)/resetpassword/$', views.PasswordReset.as_view()),
+    # url(r'^image_codes/(?P<image_code_id>.+)/$', views.ImageCodeView.as_view()),
 ]
 
 
