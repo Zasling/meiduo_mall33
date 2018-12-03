@@ -7,6 +7,7 @@ from goods.search_indexes import SKUIndex
 
 # 显示所有当前商品的所有数据
 class SKUListSerializers(serializers.ModelSerializer):
+
     class Meta:
         model = SKU
         fields = '__all__'

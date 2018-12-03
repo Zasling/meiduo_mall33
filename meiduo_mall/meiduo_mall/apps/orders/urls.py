@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^ordersList/$', views.OrderListView.as_view()),
     url(r'^orders/(?P<order_id>\d+)/uncommentgoods/$',views.CriticismView.as_view()),
     url(r'^orders/(?P<order_id>\d+)/comments/$', views.SaveCriticismView.as_view()),
-
+    url(r'^skus/(?P<sku_id>\d+)/comments/$', views.ShowGoodsCommentView.as_view()),
 ]

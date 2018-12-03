@@ -136,13 +136,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 return order
 
 
-class CriticismSerializers(serializers.ModelSerializer):
-    sku = SKUListSerializers(read_only=True)
-    class Meta:
-        model = OrderGoods
-        fields = '__all__'
-
-
+# 实现订单数据的展示
 class orderGoodsSerializer(serializers.ModelSerializer):
     sku = SKUListSerializers(read_only=True)
 
@@ -150,9 +144,55 @@ class orderGoodsSerializer(serializers.ModelSerializer):
         model = OrderGoods
         fields = '__all__'
 
+
+# 实现订单数据的展示
 class orderInfoSerializer(serializers.ModelSerializer):
     skus = orderGoodsSerializer(read_only=True,many=True)
 
     class Meta:
         model = OrderInfo
+        fields = '__all__'
+
+
+# 获取评论前端数据
+class CriticismSerializers(serializers.ModelSerializer):
+    sku = SKUListSerializers(read_only=True)
+
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+
+# 实现评论保存
+class CriticismSaveSerializers(serializers.ModelSerializer):
+    order_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = OrderGoods
+        fields = ('order_id', 'comment','score', 'is_anonymous', 'is_commented')
+
+    def create(self, validated_data):
+        context = self.context
+        sku_id = self.context['request'].data['sku']
+        order_id = int(self.context['request'].data['order'])
+        user = self.context['request'].user
+        comment = validated_data['comment']
+        score = validated_data['score']
+        is_anonymous = validated_data['is_anonymous']
+        is_commented = True
+        orders=OrderGoods.objects.filter(order_id=order_id, sku_id=sku_id)
+        for order in orders:
+            order.score = score
+            order.comment = comment
+            order.is_anonymous = is_anonymous
+            order.is_commented = is_commented
+            order.save()
+        return validated_data
+
+
+# 实现商品列表展示评论
+class ShowGoodsCommentSerializers(serializers.ModelSerializer):
+    username = serializers.CharField()
+    class Meta:
+        model = OrderGoods
         fields = '__all__'
