@@ -281,7 +281,7 @@ QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'
 QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'
 
 
-WEIBO_APP_ID = '3305669385'  # Appkey
+WEIBO_APP_ID = '3305669385'  # App_key
 WEIBO_APP_KEY = '74c7bea69d5fc64f5c3b80c802325276'   # AppSecret
 WEIBO_REDIRECT_URI = 'http://www.meiduo.site:8080/sina_callback.html'  # 回调函数
 

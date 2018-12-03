@@ -1,0 +1,2 @@
+# 图片过期时间
+IMAGE_CODE_REDIS_EXPIRES = 300
