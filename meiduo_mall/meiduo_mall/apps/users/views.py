@@ -195,3 +195,4 @@ class ImageCodeView(APIView):
         # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
         # 所以此处直接使用Django原生的HttpResponse即可
         return HttpResponse(image)
+

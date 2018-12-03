@@ -5,8 +5,9 @@ from goods.models import SKU
 from decimal import Decimal
 from rest_framework.generics import CreateAPIView,ListAPIView
 from rest_framework.mixins import ListModelMixin
-from orders.serializers import OrderShowSerializer, OrderSaveSerializer, OrderListSerializer
-
+from orders.serializers import OrderShowSerializer, OrderSaveSerializer, OrderListSerializer, CommentSerializers, \
+    CommentSaveSerializers, CommentShowSerializers
+from users.models import User
 from orders.models import OrderInfo,OrderGoods
 from orders.utils import PageNum
 from rest_framework.filters import OrderingFilter
@@ -17,7 +18,6 @@ class OrdersShowView(APIView):
     def get(self, request):
         # 获取用户对象
         user = request.user
-
         # 建立redis连接
         conn = get_redis_connection('cart')
         # 获取hash数据sku_id ,count
@@ -56,7 +56,34 @@ class OrderListView(ListAPIView):
         return order
 
 
+# 评论-获取商品信息
+class OrderComment(ListAPIView):
+    serializer_class = CommentSerializers
+    def get_queryset(self):
+        order_id = self.kwargs['order_id']
+        skus = OrderGoods.objects.filter(order_id = order_id)
+        return skus
 
+# 保存评论
+class SaveSkuComment(CreateAPIView):
+    serializer_class = CommentSaveSerializers
+
+# 商品详情中的评论展示
+class ShowComment(ListAPIView):
+    serializer_class = CommentShowSerializers
+    def get_queryset(self):
+        # 从kwargs中获取sku_id
+        sku_id = self.kwargs['sku_id']
+        # 获取商品信息
+        orders = OrderGoods.objects.filter(sku_id=sku_id,is_commented = True)
+        for sku in orders:
+            skuinfo = OrderInfo.objects.get(order_id=sku.order_id)
+            user = User.objects.get(id = skuinfo.user_id)
+            # 获取用户名，判断是否匿名
+            sku.username = user.username
+            if sku.is_anonymous == True:
+                sku.username = '****'
+        return orders
 
 
 

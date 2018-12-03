@@ -7,7 +7,6 @@ from datetime import datetime
 from decimal import Decimal
 from goods.serializers import SKUListSerializers
 class SKUSerializer(serializers.ModelSerializer):
-    # 虽然sku中有count属性,但是序列化器不定义无法提取到
     count = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -132,6 +131,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
                 conn.srem('cart_selected_%s' % user.id, *cart_selected)
                 return order
 
+# 订单内商品信息
 class OrderGoodsSerializer(serializers.ModelSerializer):
     sku = SKUListSerializers(read_only=True)
 
@@ -139,6 +139,7 @@ class OrderGoodsSerializer(serializers.ModelSerializer):
         model = OrderGoods
         fields = '__all__'
 
+# 订单展示
 class OrderListSerializer(serializers.ModelSerializer):
     skus = OrderGoodsSerializer(read_only=True,many=True)
 
@@ -146,4 +147,52 @@ class OrderListSerializer(serializers.ModelSerializer):
         model = OrderInfo
         fields = '__all__'
 
+# 评论-获取商品信息
+class CommentSerializers(serializers.ModelSerializer):
+    sku = SKUListSerializers(read_only=True)
 
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
+
+# 保存评论信息
+class CommentSaveSerializers(serializers.ModelSerializer):
+    order_id = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = OrderGoods
+        fields = ('order_id','comment','score','is_anonymous','is_commented')
+    def create(self, validated_data):
+        # 获取商品信息
+        sku_id = self.context['request'].data['sku']
+        order_id = int(self.context['request'].data['order'])
+        # 获取前端信息
+        comment = validated_data['comment']
+        score = validated_data['score']
+        is_anonymous = validated_data['is_anonymous']
+        is_commented = True
+        sku = OrderGoods.objects.get(sku_id = sku_id,order_id = order_id)
+        # 保存
+        sku.score = score
+        sku.comment = comment
+        sku.is_anonymous = is_anonymous
+        sku.is_commented = is_commented
+        sku.save()
+
+        # 修改订单status
+        # order = OrderGoods.objects.get(order_id = order_id)
+        # skus = OrderInfo.objects.filter(order_id = order_id)
+        # flag = True
+        # for sku in skus:
+        #     if sku.is_commented == False:
+        #         flag = False
+        # if flag:
+        #     order.status = 5
+
+        return validated_data
+
+# 商品详情中展示评论信息
+class CommentShowSerializers(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+    class Meta:
+        model = OrderGoods
+        fields = '__all__'
