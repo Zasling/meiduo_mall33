@@ -170,6 +170,7 @@ class CommentSaveSerializers(serializers.ModelSerializer):
         score = validated_data['score']
         is_anonymous = validated_data['is_anonymous']
         is_commented = True
+
         sku = OrderGoods.objects.get(sku_id = sku_id,order_id = order_id)
         # 保存
         sku.score = score
