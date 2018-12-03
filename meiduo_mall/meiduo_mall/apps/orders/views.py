@@ -93,9 +93,9 @@ class ShowGoodsCommentView(ListAPIView):
         orders = OrderGoods.objects.filter(sku_id=sku_id,is_commented=True)
         for order in orders:
             # 获取到orderinfo表中的数据
-            order_info = OrderInfo.objects.filter(order_id=order.order_id)
+            orderinfo_id= OrderInfo.objects.get(order_id=order.order_id)
             # 获取到user对象
-            user = User.objects.filter(id=order_info.user_id)
+            user = User.objects.get(id=orderinfo_id.user_id)
 
             # 使商品页面展示的用户等于ｕｓｅｒ对象中的用户
             order.username = user.username
