@@ -44,7 +44,7 @@ var vm = new Vue({
                 return;
             } 
             if (vm.user_id && vm.token) {
-                axios.put(this.host + '/users/'+vm.user_id+'/password/',
+                axios.put(this.host + '/users/'+vm.user_id+'/resetpassword/',
                         {
                             old_password: vm.old_pwd,
                             password: vm.new_pwd,

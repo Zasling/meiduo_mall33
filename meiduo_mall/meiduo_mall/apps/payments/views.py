@@ -55,7 +55,6 @@ class PaymentView(APIView):
 
     def put(self,request):
         # 1、获取数据
-
         data=request.query_params.dict()
         # sign 不能参与签名验证
         signature = data.pop("sign")

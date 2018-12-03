@@ -154,5 +154,28 @@ class UserAuthorizeView(ObtainJSONWebToken):
 
 
 class PasswordReset(UpdateAPIView):
-    def put(self, request):
+
+    def put(self, request,user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except:
+            return Response({'error':'数据库异常'})
+        else:
+            data = request.data
+            # 1.获取前端密码数据
+            old_password = data['old_password']
+            password = data['password']
+            password2 = data['password2']
+            # 2.判断旧密码是否正确
+            if not user.check_password(old_password):
+                return Response({'error':'密码错误'})
+            # 3.判断两次密码是否相同
+            if password != password2:
+                return Response({'error':'两次密码输入不一致'})
+            # 4.旧密码正确则保存新密码
+            user.set_password(password)
+            user.save()
+            return Response({'message': 'ok'})
+
+def post(self,request):
         pass

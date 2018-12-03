@@ -134,6 +134,7 @@ class OrderSaveSerializer(serializers.ModelSerializer):
 
 class OrderGoodsSerializer(serializers.ModelSerializer):
     sku = SKUListSerializers(read_only=True)
+
     class Meta:
         model = OrderGoods
         fields = '__all__'

@@ -47,6 +47,7 @@ class OrderSaveView(ListModelMixin, CreateAPIView):
 # 订单列表数据获取
 class OrderListView(ListAPIView):
     pagination_class = PageNum
+
     serializer_class = OrderListSerializer
 
     def get_queryset(self):

@@ -64,10 +64,10 @@ var vm = new Vue({
                             sessionStorage.username = response.data.username;
                         }
 
-                        // 跳转页面
+                        //跳转页面
                         var return_url = this.get_query_string('next');
                         if (!return_url) {
-                            return_url = '/search.html';
+                            return_url = '/index.html';
                         }
                         location.href = return_url;
                     })
