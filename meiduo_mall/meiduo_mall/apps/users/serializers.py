@@ -61,7 +61,7 @@ class UserSerializers(serializers.ModelSerializer):
         if not real_sms_code:
             raise serializers.ValidationError('短信验证码过期')
 
-        if real_sms_code.decode() != attrs['sms_code']:
+        if real_sms_code.decode().lower() != attrs['sms_code'].lower():
             raise serializers.ValidationError('验证码错误')
 
         return attrs
@@ -119,7 +119,7 @@ class EmailSerializer(serializers.ModelSerializer):
 
         return instance
 
-
+# 添加用户浏览历史
 class AddUserBrowsingHistorySerializer(serializers.Serializer):
     """
     添加用户浏览历史序列化器

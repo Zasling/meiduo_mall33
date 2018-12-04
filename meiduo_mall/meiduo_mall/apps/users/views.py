@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
@@ -148,7 +150,7 @@ class UserAuthorizeView(ObtainJSONWebToken):
         return response
 
 # 重置密码
-class PasswordReset(UpdateAPIView):
+class PasswordResetView(UpdateAPIView):
 
     def put(self, request,user_id):
         try:
@@ -180,7 +182,7 @@ class ImageCodeView(APIView):
     def get(self, request, image_code_id):
         name, text, image = captcha.generate_captcha()
 
-        redis_conn = get_redis_connection("verify_codes")
+        redis_conn = get_redis_connection("img_codes")
         redis_conn.setex("img_%s" % image_code_id, constants.IMAGE_CODE_REDIS_EXPIRES, text)
 
         # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
@@ -191,11 +193,91 @@ class ImageCodeView(APIView):
 # 检验图片验证码，判断用户名是否存在
 class CheckUsernameVIew(APIView):
     def get(self,request,username):
+        # 获取前端图片验证码数据
+        image_code = request.GET.get('text')
+        image_code_id = request.GET.get('image_code_id')
+        # 验证图片验证码
+        conn = get_redis_connection("img_codes")
+        if not image_code:
+            return Response({'error':'图片验证码错误'})
+        img_code = conn.get('img_%s' % image_code_id)
+        if img_code.decode().lower() != image_code.lower():
+            return Response({'error':'图片验证码错误'})
+
+        # 判断用户名是否存在
         try:
-            user = User.objects.get(username = username)
+            if re.match('^1[3-9]\d{9}',username):
+                user = User.objects.get(mobile=username)
+            else:
+                user = User.objects.get(username = username)
         except:
-            return Response({'error':'用户名不存在'})
+            return Response({'error':'用户不存在'})
         return Response({
-            'mobile':user.mobile
+            'mobile':user.mobile,
+            'access_token':user.id,
         })
 
+# 忘记密码-第二步
+# 发送短信验证码
+class SendSmsCodeView(APIView):
+    def get(self, request):
+        # 1.获取access_token
+        access_token = request.GET.get('access_token')
+        conn = get_redis_connection('sms_code')
+
+        user = User.objects.get(id = access_token)
+        mobile = user.mobile
+
+        # 判断是否间隔了1分钟
+        flag = conn.get('sms_code_flag_%s' % mobile)
+        if flag:
+            return Response({'error': '请求过于频繁'}, status=400)
+        # 2.生成验证码
+        sms_code = '%06d' % randint(0, 999999)
+        print(sms_code)
+        # 3. 保存验证码到redis
+        pl = conn.pipeline()
+        # 通过管道将2个相同操作进行整合，只需要连接一次redis
+        pl.setex('sms_code_%s'% mobile, 300, sms_code)
+        # 设置一个条件判断是否为1分钟后再次发送
+        pl.setex('sms_code_flag_%s' % mobile, 60, 'a')
+        pl.execute()
+        send_sms_code.delay(mobile, sms_code)
+        # 5.返回信息
+        return Response({'message': 'ok'})
+
+# 忘记密码-第三步
+# 验证短信验证码
+class CheckSmsCode(APIView):
+    def get(self,request,username):
+        # 从前端获取数据
+        sms_code = request.GET.get('sms_code')
+        user = User.objects.get(username = username)
+
+        conn = get_redis_connection('sms_code')
+        # 从redis中取出的数据为byte类型
+        try:
+            real_sms_code = conn.get('sms_code_%s' % user.mobile)
+        except:
+            raise Response({'message':'短信验证码过期'})
+        if real_sms_code.decode().lower() != sms_code.lower():
+            raise Response({'message':'验证码错误'})
+        return Response({
+            'user_id':user.id,
+            'access_token':user.id
+        })
+
+# 忘记密码-第四步
+# 保存新密码
+class NewPassword(APIView):
+    def post(self,request,user_id):
+        pwd = request.data['password']
+        pwd2 = request.data['password2']
+
+        if pwd != pwd2:
+            return Response({'message':'两次密码不一致'})
+        user = User.objects.get(id = user_id)
+        user.set_password(pwd)
+        user.save()
+
+        return Response('ok')
