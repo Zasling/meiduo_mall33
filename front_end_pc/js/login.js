@@ -98,7 +98,7 @@ var vm = new Vue({
         // qq登录
         weixin_login: function(){
             var next = this.get_query_string('next') || '/';
-            axios.get(this.host + '/oauth/weixin/authorization/?next=' + next, {
+            axios.get(this.host + '/oauth/sina/authorization/?next=' + next, {
                     responseType: 'json',
                     withCredentials: true
                 })
