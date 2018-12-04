@@ -50,7 +50,6 @@ class SmsCodeView(APIView):
         # 5.返回信息
         return Response({'message': 'ok'})
 
-
 # 判断用户名
 class UserNameView(APIView):
     def get(self, request, username):
@@ -59,7 +58,6 @@ class UserNameView(APIView):
             'username': username,
             'count': count
         })
-
 
 # 判断手机号
 class MobileView(APIView):
@@ -70,11 +68,9 @@ class MobileView(APIView):
             'count': count
         })
 
-
 # 绑定
 class UsersView(CreateAPIView):
     serializer_class = UserSerializers
-
 
 # 用户中心信息显示
 class UserDetailView(RetrieveAPIView):
@@ -86,7 +82,6 @@ class UserDetailView(RetrieveAPIView):
         # 接着将数据返回给RetrieveAPIView(大部分将数据在拓展类中进行处理,在拓展类处理的过程中又用到了序列化器.)
         return self.request.user
 
-
 # 发送验证邮件
 class EmailView(UpdateAPIView):
     serializer_class = EmailSerializer
@@ -96,7 +91,6 @@ class EmailView(UpdateAPIView):
     def get_object(self, *args, **kwargs):
         # 返回对象
         return self.request.user
-
 
 # 验证邮箱有效性
 class VerifyEmailView(APIView):
@@ -121,7 +115,6 @@ class VerifyEmailView(APIView):
             'message': 'ok'
         })
 
-
 # 保存用户浏览记录
 class UserBrowsingHistoryView(CreateAPIView):
     serializer_class = AddUserBrowsingHistorySerializer
@@ -139,7 +132,6 @@ class UserBrowsingHistoryView(CreateAPIView):
         ser = SKUListSerializers(skus, many=True)
 
         return Response(ser.data)
-
 
 # 重写ObtainJSONWebToken登陆,合并购物车
 class UserAuthorizeView(ObtainJSONWebToken):
@@ -180,13 +172,12 @@ class PasswordReset(UpdateAPIView):
             user.save()
             return Response({'message': 'ok'})
 
-# 图片验证码
+# 生成图片验证码
 class ImageCodeView(APIView):
     """
     图片验证码
     """
     def get(self, request, image_code_id):
-        # 生成验证码图片
         name, text, image = captcha.generate_captcha()
 
         redis_conn = get_redis_connection("verify_codes")
@@ -195,4 +186,16 @@ class ImageCodeView(APIView):
         # 固定返回验证码图片数据，不需要REST framework框架的Response帮助我们决定返回响应数据的格式
         # 所以此处直接使用Django原生的HttpResponse即可
         return HttpResponse(image)
+
+# 忘记密码 - 第一步
+# 检验图片验证码，判断用户名是否存在
+class CheckUsernameVIew(APIView):
+    def get(self,request,username):
+        try:
+            user = User.objects.get(username = username)
+        except:
+            return Response({'error':'用户名不存在'})
+        return Response({
+            'mobile':user.mobile
+        })
 

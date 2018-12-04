@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^authorizations/$', views.UserAuthorizeView.as_view()),
     url(r'^users/(?P<user_id>\d+)/resetpassword/$', views.PasswordReset.as_view()),
     url(r'^image_codes/(?P<image_code_id>.+)/$', views.ImageCodeView.as_view()),
+    url(r'^accounts/(?P<username>\w+)/sms/token/$',views.UserNameView.as_view()),
+
 ]
 
 
