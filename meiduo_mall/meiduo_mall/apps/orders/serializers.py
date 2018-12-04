@@ -180,14 +180,15 @@ class CommentSaveSerializers(serializers.ModelSerializer):
         sku.save()
 
         # 修改订单status
-        # order = OrderGoods.objects.get(order_id = order_id)
-        # skus = OrderInfo.objects.filter(order_id = order_id)
-        # flag = True
-        # for sku in skus:
-        #     if sku.is_commented == False:
-        #         flag = False
-        # if flag:
-        #     order.status = 5
+        order = OrderInfo.objects.get(order_id = order_id)
+        skus = OrderGoods.objects.filter(order_id = order_id)
+        flag = True
+        for sku in skus:
+            if sku.is_commented == False:
+                flag = False
+        if flag:
+            order.status = 5
+            order.save()
 
         return validated_data
 

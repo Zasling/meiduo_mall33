@@ -61,7 +61,7 @@ class OrderComment(ListAPIView):
     serializer_class = CommentSerializers
     def get_queryset(self):
         order_id = self.kwargs['order_id']
-        skus = OrderGoods.objects.filter(order_id = order_id)
+        skus = OrderGoods.objects.filter(order_id = order_id, is_commented=False)
         return skus
 
 # 保存评论
@@ -75,7 +75,7 @@ class ShowComment(ListAPIView):
         # 从kwargs中获取sku_id
         sku_id = self.kwargs['sku_id']
         # 获取商品信息
-        orders = OrderGoods.objects.filter(sku_id=sku_id,is_commented = True)
+        orders = OrderGoods.objects.filter(sku_id=sku_id, is_commented = True)
         for sku in orders:
             skuinfo = OrderInfo.objects.get(order_id=sku.order_id)
             user = User.objects.get(id = skuinfo.user_id)
