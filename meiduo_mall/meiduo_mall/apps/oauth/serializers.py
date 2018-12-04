@@ -130,11 +130,11 @@ class OauthWeiboSerializer(serializers.ModelSerializer):
         tjs = TJS(settings.SECRET_KEY, 300)
         try:
             # 如果解密成功,则token验证通过,解密得到的类型为dict类型
-            data = tjs.loads(attrs['access_token']) # {'openid':openid}
+            data = tjs.loads(attrs['access_token'])
         except:
             raise serializers.ValidationError('无效的access_token')
 
-            access_token = data['access_token']
+        access_token = data['access_token']
         # 将取出的access_token添加到attrs
         attrs['access_token'] = access_token
 
@@ -169,7 +169,7 @@ class OauthWeiboSerializer(serializers.ModelSerializer):
             user = User.objects.create_user(username=validated_data['mobile'], password=validated_data['password'], mobile=validated_data['mobile'])
 
         # 绑定token
-        OAuthSinaUser.objects.create(user=user, openid=validated_data['access_token'])
+        OAuthSinaUser.objects.create(user=user, access_token = validated_data['access_token'])
 
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER

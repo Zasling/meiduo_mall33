@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
 from oauth.models import OAuthQQUser, OAuthSinaUser
 from itsdangerous import TimedJSONWebSignatureSerializer as TJS
-from oauth.serializers import OauthSerializer
+from oauth.serializers import OauthSerializer, OauthWeiboSerializer
 from oauth.wbtool import OAuthWB
 from users.models import User
 from users.utils import merge_cart_cookie_to_redis
@@ -99,7 +99,7 @@ class OauthWeiboLoginView(APIView):
 
 # 判断用户是否绑定
 class WbOauthView(CreateAPIView):
-    serializer_class = OauthWeiboLoginView
+    serializer_class = OauthWeiboSerializer
 
     # 获取access_token
     def get(self, request):
